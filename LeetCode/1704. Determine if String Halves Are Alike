@@ -1,0 +1,15 @@
+/**
+ * @param {string} s
+ * @return {boolean}
+ */
+var halvesAreAlike = function(s) {
+    let n = s.length;
+    let left = s.substring(0,n/2);
+    let right = s.substring(n/2,n);
+    let leftvowel = left.match(/[aeiou]/gi);
+    let rightvowel = right.match(/[aeiou]/gi);
+    if(leftvowel == null && rightvowel != null) return false;
+    if(leftvowel != null && rightvowel == null) return false;
+    if(leftvowel == null && rightvowel == null) return true;
+    return leftvowel.length == rightvowel.length ? true : false;
+};
