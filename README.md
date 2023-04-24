@@ -1,7 +1,6 @@
 # Programming-Study
 
-I'm doing a programming study with my SNU colleagues (Coding Apes).   
-This repository is made for uploading weekly coding tasks.
+This repository is made for uploading solutions of algorithm problems.
 
 leetcode: https://leetcode.com/Gwo-O9/
 
