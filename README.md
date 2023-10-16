@@ -1,4 +1,4 @@
-# Programming-Study
+# Problem-Solving
 
 This repository is made for uploading solutions of algorithm problems.
 
