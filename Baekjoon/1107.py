@@ -1,6 +1,9 @@
 target = int(input())
 n = int(input())
-error_keys = list(map(int, input().split()))
+if n > 0:
+    error_keys = list(map(int, input().split()))
+else:
+    error_keys = []
 ans = abs(target - 100)
 
 for i in range(1000001):
