@@ -1,41 +1,21 @@
 from collections import deque
-n, k = map(int, input().split())
 
-result = 10000000
-visited = [0]*1000000
-q = deque([(n, 0)])
-
+N, K = map(int, input().split())
+visited = [False for _ in range(100001)]
+q = deque([(N, 0)])
+ans = 100002
 while q:
-    cur, time = q.popleft()
-    if cur == k:
-        result = time
-        break
-    if result != 10000000 and time > result:
-        break
-    walk_back, walk_front = cur - 1, cur + 1
-    warp = cur*2
-    visited[cur] = 1
-    if 100001 > walk_back >= 0 and visited[walk_back] == 0:
-        if walk_back == k:
-            result = min(result, time+1)
-            visited[walk_back] = 1
-        else:
-            visited[walk_back] = 1
-            q.append((walk_back, time+1))
-    if 100001 > walk_front >= 0 and visited[walk_front] == 0:
-        if walk_front == k:
-            result = min(result, time+1)
-            visited[walk_front] = 1
-        else:
-            visited[walk_front] = 1
-            q.append((walk_front, time+1))
-    if 100001 > warp >= 0 and visited[warp] == 0:
-        if warp == k:
-            result = min(result, time+1)
-            visited[warp] = 1
-        else:
-            visited[warp] = 1
-            q.append((warp, time+1))
+    now, time = q.popleft()
+    if now == K:
+        ans = min(time, ans)
+    if now + 1 <= 100000 and visited[now+1] is False:
+        visited[now + 1] = True
+        q.append((now+1, time+1))
+    if now - 1 >= 0 and visited[now-1] is False:
+        visited[now - 1] = True
+        q.append((now-1, time+1))
+    if 0 <= now * 2 <= 100000 and visited[now*2] is False:
+        visited[now * 2] = True
+        q.append((now*2, time+1))
 
-
-print(result)
+print(ans)

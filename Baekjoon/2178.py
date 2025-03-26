@@ -1,22 +1,28 @@
 from collections import deque
 
-n, m = map(int, input().split())
-arr = [list(map(int, list(input().strip()))) for _ in range(n)]
-q = deque([(0, 0, 1)])
-directions = [[-1,0], [1,0], [0,-1], [0,1]]
-result = 10002
+N, M = map(int, input().split())
 
+graph = []
+
+for _ in range(N):
+    graph.append(list(map(int, input().strip())))
+
+dx = [-1, 1, 0, 0]
+dy = [0, 0, 1, -1]
+q = deque([(0,0)])
+
+# BFS
 while q:
-    cur_x, cur_y, time_xy = q.popleft()
-    arr[cur_x][cur_y] = 0
+    x, y = q.popleft()
     for i in range(4):
-        nx, ny = cur_x + directions[i][0], cur_y + directions[i][1]
-        if 0 <= nx < n and 0 <= ny < m and arr[nx][ny] == 1:
-            arr[nx][ny] = 0
-            if nx == n-1 and ny == m-1:
-                result = min(time_xy+1, result)
-            else:
-                q.append((nx,ny, time_xy+1))
-print(result)
+        nx = x + dx[i]
+        ny = y + dy[i]
+        if nx < 0 or nx >= N or ny < 0 or ny >= M: # out of range
+            continue
+        if graph[nx][ny] == 0: # wall
+            continue
+        if graph[nx][ny] == 1:
+            graph[nx][ny] += graph[x][y]
+            q.append((nx,ny))
 
-
+print(graph[N-1][M-1])

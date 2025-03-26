@@ -1,34 +1,36 @@
 from collections import deque
 
-m, n, h = map(int, input().split())
-tomatoes = [[list(map(int, input().split())) for _ in range(n)] for _ in range(h)]
+M, N, H = map(int, input().split())
 
-directions = [[-1, 0, 0], [1, 0, 0], [0, 1, 0], [0, -1, 0], [0, 0, -1], [0, 0, 1]]
-cnt = 0
-expected_cnt = m*n*h
-ans = 0
+tomatoes = [[list(map(int, input().split())) for _ in range(N)] for _ in range(H)]
+
+dx = [0, 0, 0, 0, 1, -1]
+dy = [0, 0, 1, -1, 0, 0]
+dz = [1, -1, 0, 0, 0, 0]
+
+expected_cnt = 0
+ans_time = 0
 q = deque()
-for i in range(n):
-    for j in range(m):
-        for k in range(h):
-            if tomatoes[k][i][j] == 1:
-                q.append([i, j, k, 0])
-            if tomatoes[k][i][j] == -1:
-                expected_cnt -= 1
+cnt = 0
+for i in range(H):
+    for j in range(N):
+        for k in range(M):
+            if tomatoes[i][j][k] == 0:
+                expected_cnt += 1
+            if tomatoes[i][j][k] == 1:
+                q.append((i, j, k, 0))
 
-cnt = len(q)
 
 while q:
-    x, y, z, time = q.popleft()
+    x,y,z,time = q.popleft()
     for i in range(6):
-        nx, ny, nz = x + directions[i][0], y + directions[i][1], z + directions[i][2]
-        if 0 <= nx < n and 0 <= ny < m and 0 <= nz < h and tomatoes[nz][nx][ny] == 0:
-            tomatoes[nz][nx][ny] = 1
-            cnt += 1
+        nx, ny, nz = x + dx[i], y + dy[i], z + dz[i]
+        if nx < 0 or nx >= H or ny < 0 or ny >= N or nz < 0 or nz >= M:
+            continue
+        if tomatoes[nx][ny][nz] == 0:
+            tomatoes[nx][ny][nz] = 1
             q.append((nx, ny, nz, time+1))
-    ans = time
+            cnt += 1
+            ans_time = max(ans_time, time+1)
 
-if cnt == expected_cnt:
-    print(ans)
-else:
-    print(-1)
+print(ans_time) if cnt == expected_cnt else print(-1)

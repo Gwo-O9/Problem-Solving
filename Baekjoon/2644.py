@@ -2,35 +2,29 @@ from collections import deque
 
 n = int(input())
 
-a, b = map(int,input().split())
+a, b = map(int, input().split())
 
-m = int(input())
+r = int(input())  # number of relationship
 
-relationships = [[0]*n for _ in range(n)]
+graph = [[False for _ in range(n+1)] for _ in range(n+1)]
+visited = [False for _ in range(n+1)]
 
-q = deque([(a-1, 0)])
+for _ in range(r):
+    x, y = map(int, input().split())
+    graph[x][y] = graph[y][x] = True
 
-result = 10000000
-
-visited = [[0]*n for _ in range(n)]
-
-for _ in range(m):
-    temp1, temp2 = map(int, input().split())
-    relationships[temp1-1][temp2-1] = relationships[temp2-1][temp1-1] = 1
-    
+# tuple -> personal number, chon
+q = deque([(a, 0)])
+visited[a] = True
+answer = []
 while q:
-    p, chon = q.popleft()
-    for i in range(n):
-        if i == p:
-            continue
-        if relationships[p][i] == 1 and visited[p][i] == 0:
-            if i == b-1:
-                result = min(result, chon+1)
+    now, chon = q.popleft()
+    for i in range(1, n+1):
+        if graph[now][i] is True and visited[i] is False:
+            visited[i] = True
+            if i == b:
+                answer.append(chon+1)
             else:
                 q.append((i, chon+1))
-                visited[p][i] = visited[i][p] = 1
 
-if result == 10000000:
-    print(-1)
-else:
-    print(result)
+print(min(answer)) if len(answer) != 0 else print(-1)
