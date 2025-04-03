@@ -1,32 +1,34 @@
-n, m = map(int, input().split())
-blocks = [list(map(int, input().split())) for _ in range(n)]
+N, M = map(int, input().split())
+graph = [list(map(int, input().split())) for _ in range(N)]
+visited = [[False for _ in range(M)] for _ in range(N)]
 ans = 0
-directions = [[-1, 0], [1, 0], [0, -1], [0, 1]]
-visited = [[0]*m for _ in range(n)]
+directions = [[0, 1], [0, -1], [1, 0], [-1, 0]]
 
-def dfs(i, j, graph, total, cnt):
+
+def dfs(graph, i, j, cnt, value):
     global ans
-    global directions
-    global n, m
     global visited
     if cnt == 4:
-        ans = max(ans, total)
+        ans = max(ans, value)
         return
+
     for d in range(4):
         nx, ny = i + directions[d][0], j + directions[d][1]
-        if 0 <= nx < n and 0 <= ny < m and visited[nx][ny] == 0:
-            if cnt == 2:
-                visited[nx][ny] = 1
-                dfs(i, j, graph, total + graph[nx][ny], cnt + 1)
-                visited[nx][ny] = 0
-            visited[nx][ny] = 1
-            dfs(nx, ny, graph, total+graph[nx][ny], cnt + 1)
-            visited[nx][ny] = 0
+        if not (0 <= nx < N) or not (0 <= ny < M) or visited[nx][ny] is True:
+            continue
+        if cnt == 2:
+            visited[nx][ny] = True
+            dfs(graph, i, j, cnt + 1, value + graph[nx][ny])
+            visited[nx][ny] = False
+        visited[nx][ny] = True
+        dfs(graph, nx, ny, cnt + 1, value + graph[nx][ny])
+        visited[nx][ny] = False
 
-for i in range(n):
-    for j in range(m):
-        visited[i][j] = 1
-        dfs(i, j, blocks, blocks[i][j], 1)
-        visited[i][j] = 0
+
+for i in range(N):
+    for j in range(M):
+        visited[i][j] = True
+        dfs(graph, i, j, 1, graph[i][j])
+        visited[i][j] = False
 
 print(ans)

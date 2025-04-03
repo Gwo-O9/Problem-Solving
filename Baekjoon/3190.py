@@ -8,54 +8,43 @@ def turn(c, direction):
     return direction
 
 
-N = int(input())  # 보드 사이즈
+N = int(input())  # 보드의 크기
 K = int(input())  # 사과의 개수
-board = [[0] * N for _ in range(N)]  # board 0으로 초기화
-board[0][0] = 2
-second = 0  # 게임이 지난 후 시간
-x, y = 0, 0 # 뱀 머리의 현재 위치
-op_dict = {}
-queue = deque()
-queue.append(0)
-queue.append(0)
 directions = [[-1, 0], [0, -1], [1, 0], [0, 1]]  # 0(북), 1(서), 2(남), 3(동)
-d = 3  # 뱀의 최초 방향 3
-
+d = 3
+graph = [[0 for _ in range(N)] for _ in range(N)]
 for _ in range(K):
     r, c = map(int, input().split())
-    board[r - 1][c - 1] = 1  # 사과가 있는 위치는 1
-
-n = int(input())
-
-for _ in range(n):
-    a, b = input().split()
-    op_dict[int(a)] = b
+    graph[r - 1][c - 1] = 1  # 사과
+action_num = int(input())
+operations = {}
+for _ in range(action_num):
+    x, o = input().split()
+    operations[int(x)] = o
+graph[0][0] = 2
+x, y = 0, 0
+q = deque([(0, 0)])
+second = 0
 
 while True:
-    second += 1  # 1초 증가
-    # 바라보고 있는 방향으로 이동
+    second += 1
+
     x += directions[d][0]
     y += directions[d][1]
 
-    #뱀이 벽이나 본인 몸에 박으면 종료
-    if not(0 <= x < N and 0 <= y < N) or board[x][y] == 2:
+    if not (0 <= x < N) or not (0 <= y < N) or graph[x][y] == 2:  # 종료 조건
         break
 
-    if board[x][y] == 1: #사과가 있을 때
-        board[x][y] = 2 #사과가 있던 자리는 뱀이 차지
-        queue.append(x) # queue에 뱀 머리 추가
-        queue.append(y)
-        if second in op_dict:
-            d = turn(op_dict[second], d)
+    if graph[x][y] == 1:
+        graph[x][y] = 2
+        q.append((x, y))
+    else:
+        graph[x][y] = 2
+        q.append((x,y))
+        bx, by = q.popleft()
+        graph[bx][by] = 0
 
-    elif board[x][y] == 0: #빈 공간일 때
-        board[x][y] = 2 # 빈 공간은 뱀이 차지
-        queue.append(x) # queue에 뱀 머리 추가
-        queue.append(y)
-        tailx = queue.popleft() # queue에서 뱀 꼬리 제거
-        taily = queue.popleft()
-        board[tailx][taily] = 0 #꼬리 빈 공간으로 갱신
-        if second in op_dict:
-            d = turn(op_dict[second], d)
+    if second in operations:
+        d = turn(operations[second], d)
 
 print(second)
