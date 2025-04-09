@@ -1,45 +1,75 @@
+# 13:55
+from copy import deepcopy
 from collections import deque
-import sys
-input = lambda: sys.stdin.readline().rstrip()
-n, q = map(int, input().split())
-size = 2**n
-ice_field = [list(map(int, input().split())) for _ in range(size)]
+
+
+N, Q = map(int, input().split())
+n = 2**N
+graph = [list(map(int, input().split())) for _ in range(n)]
 magics = list(map(int, input().split()))
-directions = [[-1, 0], [1, 0], [0, 1], [0, -1]]
-visited = [[0] * size for _ in range(size)]
+directions = [[0, -1], [0, 1], [1, 0], [-1, 0]]
 
-def rotate_ice(graph, l):
-    temp_field = [[0] * size for _ in range(size)]
-    for x in range(0, size, 2**l):
-        for y in range(0, size, 2**l):
-            for i in range(2**l):
-                for j in range(2**l):
-                    temp_field[x + j][y + 2**l - 1 - i] = graph[x + i][y + j]
-    return temp_field
+def rotate_graph(graph, magic_number):
+    new_graph = deepcopy(graph)
+    size = 2**magic_number
+    for i in range(0, n, size):
+        for j in range(0, n, size):
+            for x in range(size):
+                for y in range(size):
+                    new_graph[i + y][j + size - 1 - x] = graph[i + x][j + y]
+    return new_graph
 
-def count_bfs(graph, i, j):
-    q = deque([(i, j)])
-    cnt = 0
-    while q:
-        r, c = q.popleft()
-        for dx, dy in directions:
-            nr, nc = r + dx, c + dy
-            if 0 <= nr < size and 0 <= nc < size and not visited[nr][nc] and graph[nr][nc]:
-                visited[nr][nc] = 1
-                q.append((nr, nc))
-                cnt += 1
-    return cnt
+def melt(graph):
+    new_graph = deepcopy(graph)
+    for i in range(n):
+        for j in range(n):
+            if graph[i][j] <= 0:
+                continue
+            cnt = 0
+            for d in range(4):
+                nx, ny = i + directions[d][0], j + directions[d][1]
+                if 0 <= nx < n and 0 <= ny < n and graph[nx][ny] > 0:
+                    cnt += 1
+            if cnt < 3:
+                new_graph[i][j] -= 1
+    return new_graph
+
+def get_remians(graph):
+    global n
+    remains = 0
+    for i in range(n):
+        for j in range(n):
+            if graph[i][j] > 0:
+                remains += graph[i][j]
+    return remains
+
+def get_max_remain_ice(graph):
+    global n, directions
+    max_size = 0
+    visited = [[False for _ in range(n)] for _ in range(n)]
+    for i in range(n):
+        for j in range(n):
+            if visited[i][j] or graph[i][j] <= 0:
+                continue
+            q = deque([(i, j)])
+            cnt = 1
+            while q:
+                x, y = q.popleft()
+                visited[x][y] = True
+                for d in range(4):
+                    nx, ny = x + directions[d][0], y + directions[d][1]
+                    if 0 <= nx < n and 0 <= ny < n and not visited[nx][ny] and graph[nx][ny] > 0:
+                        q.append((nx, ny))
+                        visited[nx][ny] = True
+                        cnt = cnt + 1
+            max_size = max(max_size, cnt)
+    return max_size
+
 
 for magic in magics:
-    ice_field = rotate_ice(ice_field, magic)
-    neighbor_counts = [[sum(1 for dx, dy in directions if 0 <= x + dx < size and 0 <= y + dy < size and ice_field[x + dx][y + dy] > 0) for y in range(size)] for x in range(size)]
-    for i in range(size):
-        for j in range(size):
-            if neighbor_counts[i][j] < 3 and ice_field[i][j]:
-                ice_field[i][j] -= 1
+    graph = rotate_graph(graph, magic)
+    graph = melt(graph)
 
-ice = sum(sum(row) for row in ice_field)
-max_ice = max((count_bfs(ice_field, i, j) for i in range(size) for j in range(size) if ice_field[i][j] and not visited[i][j]), default=0)
+print(get_remians(graph))
+print(get_max_remain_ice(graph))
 
-print(ice)
-print(max_ice)
